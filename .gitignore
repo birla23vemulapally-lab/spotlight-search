@@ -1,0 +1,15 @@
+bin/
+obj/
+output/
+publish/
+target/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local runtime data
+*.db
+*.db-shm
+*.db-wal

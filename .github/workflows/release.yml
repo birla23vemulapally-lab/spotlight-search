@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  installer:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Publish application
+        shell: pwsh
+        run: |
+          dotnet publish .\SpotlightNative.csproj -c Release -r win-x64 --self-contained true `
+            -p:PublishSingleFile=true -o .\publish
+
+      - name: Setup Inno Setup
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: installer/SpotlightNative.iss
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" .\installer\SpotlightNative.iss
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: output/Setup.exe
